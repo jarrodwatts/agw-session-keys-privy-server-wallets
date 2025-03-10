@@ -4,6 +4,8 @@ This example shows you how to use [Privy Server Wallets](https://docs.privy.io/g
 as the signer wallet for [Abstract Global Wallet session keys](https://docs.abs.xyz/abstract-global-wallet/agw-client/session-keys/overview).
 The Privy Server Wallet acts as a the "backend" wallet that is used as the signer approved to call transactions defined in the session key configuration.
 
+[diagram](./public/diagram.png)
+
 ## Local Development
 
 1. Get a copy of the `agw-session-keys-privy-server-wallets` example directory:
