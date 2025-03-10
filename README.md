@@ -6,10 +6,10 @@ The Privy Server Wallet acts as a the "backend" wallet that is used as the signe
 
 ## Local Development
 
-1. Get a copy of the `server-wallets-session-keys` example directory:
+1. Get a copy of the `agw-session-keys-privy-server-wallets` example directory:
 
    ```bash
-   mkdir -p server-wallets-session-keys && curl -L https://codeload.github.com/Abstract-Foundation/examples/tar.gz/main | tar -xz --strip=2 -C server-wallets-session-keys examples-main/server-wallets-session-keys && cd server-wallets-session-keys
+   mkdir -p agw-session-keys-privy-server-wallets && curl -L https://codeload.github.com/Abstract-Foundation/examples/tar.gz/main | tar -xz --strip=2 -C agw-session-keys-privy-server-wallets examples-main/agw-session-keys-privy-server-wallets && cd agw-session-keys-privy-server-wallets
    ```
 
 2. Install the dependencies:
