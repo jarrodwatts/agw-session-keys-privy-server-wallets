@@ -13,7 +13,7 @@ type ServerWalletResponse = {
 };
 
 /**
- * Submit a transaction from a session key using the Privy server wallet.
+ * Submit a transaction from a session key using the Privy server wallet as the signer.
  * Docs: https://docs.privy.io/guide/server-wallets/usage/ethereum#viem
  * @returns {Promise<NextResponse<ServerWalletResponse>>} An object containing the transaction hash or error.
  */
@@ -23,50 +23,41 @@ export async function POST(
   try {
     checkRequiredEnvVars();
 
-    // Get the AGW address and session config from the request body
+    // Get the AGW wallet address and session config from the request body
     const body = await request.json();
     const { agwAddress, sessionConfig: rawSessionConfig } = body;
-
-    // Deserialize the session config using the existing function
-    // Since deserializeWithBigInt expects a JSON string, we need to stringify and then parse
     const sessionConfig = deserializeWithBigInt(rawSessionConfig);
 
-    console.log(`🔑 Session config after deserialization:`, sessionConfig);
-
-    // Initialize Privy client
+    // Initialize Privy client using environment variables
     const privy = new PrivyClient(
       process.env.PRIVY_APP_ID!,
       process.env.PRIVY_APP_SECRET!
     );
 
-    // Create a viem account instance for a wallet
+    // Create a viem account instance for the server wallet
     const account = await createViemAccount({
       walletId: process.env.PRIVY_SERVER_WALLET_ID!,
       address: process.env.PRIVY_SERVER_WALLET_ADDRESS as Address,
       privy,
     });
-    console.log(`🔑 Server wallet address: ${account.address}`);
 
-    // Initialize the AGW Session Client to send transactions from the server wallet
+    // Initialize the AGW Session client to send transactions from the server wallet using the session key
     const agwSessionClient = createSessionClient({
-      account: agwAddress,
+      account: agwAddress, // The AGW wallet address to send the transaction from
       chain,
-      signer: account,
-      session: sessionConfig,
+      signer: account, // The Privy server wallet as the signer
+      session: sessionConfig, // The session configuration loaded from local storage
     });
-    console.log(`🔑 AGW Session Client initialized`);
 
-    // Use the session client to make transactions
+    // Use the session client to make transactions. e.g. mint NFT the AGW wallet address
     const hash = await agwSessionClient.writeContract({
-      account: agwAddress,
+      account: agwAddress, // The AGW wallet address to send the transaction from
       chain,
-      address: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA",
-      abi: parseAbi(["function mint(address,uint256) external"]),
-      functionName: "mint",
-      args: [agwAddress, BigInt(1)],
+      address: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA", // The contract address to send the transaction to
+      abi: parseAbi(["function mint(address,uint256) external"]), // The contract ABI
+      functionName: "mint", // The contract function to call
+      args: [agwAddress, BigInt(1)], // The function arguments (e.g. mint 1 NFT to the AGW wallet address)
     });
-
-    console.log(`✅ Transaction submitted. Hash: ${hash}`);
 
     return NextResponse.json({
       hash,

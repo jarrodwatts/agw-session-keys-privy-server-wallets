@@ -1,8 +1,17 @@
+/**
+ * In this example, we store the session key objects in the browser's localStorage.
+ * This file is a set of helper functions to:
+ *  - Serialize and deserialize the session key objects to and from strings.
+ *  - Save and retrieve the session key objects to localStorage.
+ *  - Check if a session key is valid.
+ *  - Clear the session key from localStorage.
+ */
 import { SessionConfig } from "@abstract-foundation/agw-client/sessions";
 
+// The key to store the session key objects in localStorage
 const SESSION_KEY = "agw-session-config";
 
-// Custom serializer that handles BigInt values
+// Serialize the session key with a hack to handle BigInt values
 export function serializeWithBigInt(obj: any): string {
   return JSON.stringify(obj, (key, value) => {
     // Convert BigInt to string with a special prefix
@@ -13,7 +22,7 @@ export function serializeWithBigInt(obj: any): string {
   });
 }
 
-// Custom deserializer that converts BigInt strings back to BigInt
+// Deserialize the session key with a hack to handle BigInt values
 export function deserializeWithBigInt(json: string): any {
   return JSON.parse(json, (key, value) => {
     // Check if the value is a string and has our special BigInt prefix
@@ -25,12 +34,20 @@ export function deserializeWithBigInt(json: string): any {
   });
 }
 
+/**
+ * Save the session key to localStorage.
+ * @param config - The session key configuration object.
+ */
 export function saveSessionConfig(config: SessionConfig): void {
   if (typeof window !== "undefined") {
     localStorage.setItem(SESSION_KEY, serializeWithBigInt(config));
   }
 }
 
+/**
+ * Get the session key from localStorage.
+ * @returns The session key configuration object or null if it doesn't exist.
+ */
 export function getSessionConfig(): SessionConfig | null {
   if (typeof window !== "undefined") {
     const stored = localStorage.getItem(SESSION_KEY);
@@ -41,15 +58,21 @@ export function getSessionConfig(): SessionConfig | null {
   return null;
 }
 
+/**
+ * Check if the session key is valid by comparing the current time with the expiration time.
+ * @returns True if the session key is valid, false otherwise.
+ */
 export function hasValidSession(): boolean {
   const config = getSessionConfig();
   if (!config) return false;
 
-  // Check if session is expired
   const now = BigInt(Math.floor(Date.now() / 1000));
   return config.expiresAt > now;
 }
 
+/**
+ * Clear the session key from localStorage.
+ */
 export function clearSessionConfig(): void {
   if (typeof window !== "undefined") {
     localStorage.removeItem(SESSION_KEY);

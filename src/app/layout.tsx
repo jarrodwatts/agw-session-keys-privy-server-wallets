@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-import { Providers } from "@/components/providers";
+import { NextAbstractWalletProvider } from "@/components/agw-provider";
 import { Toaster } from "sonner";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Abstract Global Wallet with Session Keys",
+  title: "AGW Session Keys + Privy Server Wallets",
   description:
-    "A demo application integrating Abstract Global Wallet with session keys",
+    "A demo application integrating Abstract Global Wallet with session keys and Privy server wallets",
 };
 
 export default function RootLayout({
@@ -20,10 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
+        <NextAbstractWalletProvider>
           {children}
           <Toaster position="top-right" />
-        </Providers>
+        </NextAbstractWalletProvider>
       </body>
     </html>
   );

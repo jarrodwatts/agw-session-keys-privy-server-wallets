@@ -5,12 +5,17 @@ import {
 } from "@abstract-foundation/agw-client/sessions";
 import { toFunctionSelector } from "viem";
 
+/**
+ * Create a session key configuration object given a server wallet address.
+ * @param serverWalletAddress - The Privy server wallet address to use as the signer.
+ * @returns SessionConfig object.
+ */
 export function createSessionConfig(
   serverWalletAddress: `0x${string}`
 ): SessionConfig {
   return {
-    signer: serverWalletAddress,
-    expiresAt: BigInt(Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60),
+    signer: serverWalletAddress, // Pass the server wallet address as the signer
+    expiresAt: BigInt(Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60), // 1 week
     feeLimit: {
       limitType: LimitType.Lifetime,
       limit: parseEther("1"), // 1 ETH lifetime gas limit
@@ -18,8 +23,8 @@ export function createSessionConfig(
     },
     callPolicies: [
       {
-        target: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA", // Contract address
-        selector: toFunctionSelector("mint(address,uint256)"), // Allowed function
+        target: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA", // Example NFT Contract
+        selector: toFunctionSelector("mint(address,uint256)"), // Allowed function (mint)
         valueLimit: {
           limitType: LimitType.Unlimited,
           limit: BigInt(0),

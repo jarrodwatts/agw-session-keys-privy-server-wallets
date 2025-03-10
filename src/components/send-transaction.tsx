@@ -15,18 +15,30 @@ import { chain } from "@/const/chain";
 import { Separator } from "./ui/separator";
 
 interface SendTransactionProps {
-  onSessionReset?: () => void;
+  onSessionReset: () => void;
 }
 
+/**
+ * Component to allow the user to send a transaction using the session key.
+ * We call the /api/server-wallet/submit-tx route to send the transaction
+ * and provide the agw address + session config.
+ */
 export function SendTransaction({ onSessionReset }: SendTransactionProps) {
+  // Get the user's wallet address and connection status
   const { address, isConnected } = useAccount();
+
+  // State to store the transaction hash and loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hash, setHash] = useState<string | null>(null);
 
+  // If the user is not connected, don't show the component
   if (!isConnected || !address) {
     return null;
   }
 
+  /**
+   * Send a transaction using the session key with the Privy server wallet as the signer.
+   */
   async function handleSendTransaction() {
     setIsSubmitting(true);
     try {
@@ -35,10 +47,12 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
 
       if (!sessionConfig) {
         toast.error("No valid session found");
-        onSessionReset?.();
+        onSessionReset();
         return;
       }
 
+      // Call the /api/server-wallet/submit-tx route to send the transaction
+      // Provide the agw address + session config in the body
       const response = await fetch("/api/server-wallet/submit-tx", {
         method: "POST",
         headers: {
@@ -50,9 +64,10 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
         }),
       });
 
+      // Get the response from the server
       const data = await response.json();
-      console.log(data);
 
+      // If the transaction is successful, set the transaction hash and show a success toast
       if (data.hash) {
         setHash(data.hash);
         toast("Transaction sent successfully!");
@@ -67,9 +82,12 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
     }
   }
 
+  /**
+   * Reset the session key and show a success toast
+   */
   function handleResetSession() {
     clearSessionConfig();
-    onSessionReset?.();
+    onSessionReset();
     toast("Session reset successfully");
   }
 

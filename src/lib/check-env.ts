@@ -1,4 +1,5 @@
 /**
+ * This is just for helping get you started running the repo locally.
  * Checks if required environment variables are set.
  * If any are missing, logs instructions on how to set them before throwing an error.
  */

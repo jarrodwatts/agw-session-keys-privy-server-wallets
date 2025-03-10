@@ -9,13 +9,11 @@ import { hasValidSession } from "@/lib/session-storage";
 export default function Home() {
   const [hasSession, setHasSession] = useState(false);
 
-  // Check for valid session on mount and when localStorage changes
+  // Listen for changes in the session key value in localStorage
   useEffect(() => {
     const checkSession = () => {
       setHasSession(hasValidSession());
     };
-
-    // Check on mount
     checkSession();
 
     // Listen for storage events (in case session is created in another tab)

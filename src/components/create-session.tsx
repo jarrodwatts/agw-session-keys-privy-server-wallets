@@ -13,15 +13,26 @@ interface CreateSessionProps {
   onSessionCreated: () => void;
 }
 
+/**
+ * Shows the user the create session button and handles the creation of a new session key.
+ * The session key is stored inside local storage of the browser.
+ * Docs: https://docs.abs.xyz/abstract-global-wallet/agw-react/session-keys
+ */
 export function CreateSession({ onSessionCreated }: CreateSessionProps) {
+  // Get the user's wallet address and connection status
   const { address, isConnected } = useAccount();
+
+  // Create a new session key. Docs: https://docs.abs.xyz/abstract-global-wallet/agw-react/hooks/useCreateSession
   const { createSessionAsync, isPending, isError, error } = useCreateSession();
+
+  // State to store the server wallet address
   const [serverWalletAddress, setServerWalletAddress] = useState<
     `0x${string}` | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch the server wallet address when the component mounts
+  // Fetch the server wallet address by calling the /api/server-wallet/get route
+  // We do this so we can create the session config that uses the server wallet address as the signer.
   useEffect(() => {
     async function fetchServerWalletAddress() {
       try {
@@ -45,10 +56,12 @@ export function CreateSession({ onSessionCreated }: CreateSessionProps) {
     fetchServerWalletAddress();
   }, []);
 
+  // if the user is not connected, don't show the component
   if (!isConnected) {
     return null;
   }
 
+  // loading state
   if (isLoading) {
     return (
       <Card className="w-full max-w-md">
@@ -62,6 +75,7 @@ export function CreateSession({ onSessionCreated }: CreateSessionProps) {
     );
   }
 
+  // error state
   if (!serverWalletAddress) {
     return (
       <Card className="w-full max-w-md">
@@ -81,17 +95,14 @@ export function CreateSession({ onSessionCreated }: CreateSessionProps) {
     if (!address) return;
 
     try {
-      // Create the session config
+      // Create the session config and save it to local storage
       const sessionConfig = createSessionConfig(serverWalletAddress);
-
-      // Save to local storage
       saveSessionConfig(sessionConfig);
 
+      // Create the session key with the config (that includes the server wallet address as the signer)
       const result = await createSessionAsync({
         session: sessionConfig,
       });
-
-      console.log(result);
 
       if (result.session) {
         toast("Session created successfully");
