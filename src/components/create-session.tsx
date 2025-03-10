@@ -6,9 +6,8 @@ import { useAccount } from "wagmi";
 import { useCreateSession } from "@abstract-foundation/agw-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { LimitType } from "@abstract-foundation/agw-client/sessions";
-import { parseEther, toFunctionSelector } from "viem";
+import { parseEther } from "viem";
 
 export function CreateSession() {
   const { address, isConnected } = useAccount();
