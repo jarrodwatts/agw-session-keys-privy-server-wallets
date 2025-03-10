@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrivyClient } from "@privy-io/server-auth";
+import { checkRequiredEnvVars } from "@/lib/check-env";
 
 type ServerWalletResponse = {
   walletId: string;
@@ -12,11 +13,7 @@ type ServerWalletResponse = {
  * @returns {Promise<NextResponse<ServerWalletResponse>>} An object containing the walletId, wallet address.
  */
 export async function GET(): Promise<NextResponse<ServerWalletResponse>> {
-  if (!process.env.PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
-    throw new Error(
-      "❌ .env variables: PRIVY_APP_ID and PRIVY_APP_SECRET must be set"
-    );
-  }
+  checkRequiredEnvVars(["PRIVY_APP_ID", "PRIVY_APP_SECRET"]);
 
   // Initialize Privy client
   const privy = new PrivyClient(
@@ -29,7 +26,11 @@ export async function GET(): Promise<NextResponse<ServerWalletResponse>> {
     chainType: "ethereum",
   });
 
-  console.log("Server wallet created:", { walletId, address });
+  console.log(`✅ Server wallet created. 
+    
+Store the following values in your environment variables or datababase:
+  PRIVY_SERVER_WALLET_ID: ${walletId}
+  PRIVY_SERVER_WALLET_ADDRESS: ${address}`);
 
   return NextResponse.json({
     walletId,

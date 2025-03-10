@@ -6,27 +6,25 @@ import { useAccount } from "wagmi";
 import { useCreateSession } from "@abstract-foundation/agw-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LimitType } from "@abstract-foundation/agw-client/sessions";
-import { parseEther } from "viem";
+import { createSessionConfig } from "@/lib/session-config";
 
 export function CreateSession() {
   const { address, isConnected } = useAccount();
   const { createSessionAsync, isPending, isError, error } = useCreateSession();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [serverWalletAddress, setServerWalletAddress] = useState<string | null>(
-    null
-  );
+  const [serverWalletAddress, setServerWalletAddress] = useState<
+    `0x${string}` | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch the server wallet address when the component mounts
   useEffect(() => {
-    // Fetch the server wallet address when the component mounts
     async function fetchServerWalletAddress() {
       try {
-        const response = await fetch("/api/server-wallet/address");
+        const response = await fetch("/api/server-wallet/get");
         const data = await response.json();
 
-        if (data.success) {
-          setServerWalletAddress(data.address);
+        if (data.address) {
+          setServerWalletAddress(data.address as `0x${string}`);
         } else {
           console.error("Failed to fetch server wallet address:", data.error);
           toast("Failed to fetch server wallet address");
@@ -78,45 +76,13 @@ export function CreateSession() {
     if (!address) return;
 
     try {
-      setIsSubmitting(true);
-
-      // Create a session that expires after 7 days
-      const expiresAt = BigInt(
-        Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60
-      ); // 7 days
-
       const result = await createSessionAsync({
-        session: {
-          signer: serverWalletAddress as `0x${string}`,
-          expiresAt,
-          feeLimit: {
-            limitType: LimitType.Lifetime,
-            limit: parseEther("0.1"), // 0.1 ETH lifetime gas limit
-            period: BigInt(0),
-          },
-          callPolicies: [],
-          transferPolicies: [],
-        },
+        session: createSessionConfig(serverWalletAddress),
       });
 
-      console.log("Session created:", result);
+      console.log(result);
 
-      // Send the session ID to our API endpoint
-      const response = await fetch("/api/session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sessionId: result,
-          expiresAt: Number(expiresAt),
-          userWalletAddress: address,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
+      if (result.session) {
         toast("Session created successfully");
       } else {
         toast("Failed to store session information");
@@ -124,27 +90,26 @@ export function CreateSession() {
     } catch (err) {
       console.error("Error creating session:", err);
       toast("Failed to create session");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md gap-3">
       <CardHeader>
-        <CardTitle>Create Session Key</CardTitle>
+        <CardTitle>1. Create Session Key</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-gray-500 mb-4">
-          Create a new session that allows our server wallet to execute
-          transactions on your behalf. The session will expire after 7 days.
+          Create a new session that allows the Privy Server Wallet to execute
+          NFT mint transactions on behalf of your AGW.
+          <br /> <br /> The session will expire after 7 days.
         </p>
         <Button
           onClick={handleCreateSession}
-          disabled={isPending || isSubmitting}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+          disabled={isPending}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white hover:cursor-pointer"
         >
-          {isPending || isSubmitting ? "Creating..." : "Create Session Key"}
+          {isPending ? "Creating..." : "Create Session Key"}
         </Button>
         {isError && (
           <p className="mt-2 text-sm text-red-500">
