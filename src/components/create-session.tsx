@@ -7,8 +7,13 @@ import { useCreateSession } from "@abstract-foundation/agw-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createSessionConfig } from "@/lib/session-config";
+import { saveSessionConfig } from "@/lib/session-storage";
 
-export function CreateSession() {
+interface CreateSessionProps {
+  onSessionCreated: () => void;
+}
+
+export function CreateSession({ onSessionCreated }: CreateSessionProps) {
   const { address, isConnected } = useAccount();
   const { createSessionAsync, isPending, isError, error } = useCreateSession();
   const [serverWalletAddress, setServerWalletAddress] = useState<
@@ -76,14 +81,21 @@ export function CreateSession() {
     if (!address) return;
 
     try {
+      // Create the session config
+      const sessionConfig = createSessionConfig(serverWalletAddress);
+
+      // Save to local storage
+      saveSessionConfig(sessionConfig);
+
       const result = await createSessionAsync({
-        session: createSessionConfig(serverWalletAddress),
+        session: sessionConfig,
       });
 
       console.log(result);
 
       if (result.session) {
         toast("Session created successfully");
+        onSessionCreated();
       } else {
         toast("Failed to store session information");
       }
@@ -96,13 +108,12 @@ export function CreateSession() {
   return (
     <Card className="w-full max-w-md gap-3">
       <CardHeader>
-        <CardTitle>1. Create Session Key</CardTitle>
+        <CardTitle>Create Session Key</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-gray-500 mb-4">
           Create a new session that allows the Privy Server Wallet to execute
           NFT mint transactions on behalf of your AGW.
-          <br /> <br /> The session will expire after 7 days.
         </p>
         <Button
           onClick={handleCreateSession}

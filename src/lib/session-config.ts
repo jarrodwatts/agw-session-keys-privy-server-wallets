@@ -10,7 +10,7 @@ export function createSessionConfig(
 ): SessionConfig {
   return {
     signer: serverWalletAddress,
-    expiresAt: BigInt(1742186143),
+    expiresAt: BigInt(Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60),
     feeLimit: {
       limitType: LimitType.Lifetime,
       limit: parseEther("1"), // 1 ETH lifetime gas limit

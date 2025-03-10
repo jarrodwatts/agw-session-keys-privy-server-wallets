@@ -1,10 +1,31 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { LoginButton } from "@/components/login-button";
 import { CreateSession } from "@/components/create-session";
 import { SendTransaction } from "@/components/send-transaction";
+import { hasValidSession } from "@/lib/session-storage";
 
 export default function Home() {
+  const [hasSession, setHasSession] = useState(false);
+
+  // Check for valid session on mount and when localStorage changes
+  useEffect(() => {
+    const checkSession = () => {
+      setHasSession(hasValidSession());
+    };
+
+    // Check on mount
+    checkSession();
+
+    // Listen for storage events (in case session is created in another tab)
+    window.addEventListener("storage", checkSession);
+
+    return () => {
+      window.removeEventListener("storage", checkSession);
+    };
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
       <div className="max-w-4xl w-full space-y-8">
@@ -21,9 +42,12 @@ export default function Home() {
         <div className="flex flex-col items-center space-y-6">
           <LoginButton />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-            <CreateSession />
-            <SendTransaction />
+          <div className="w-full max-w-md">
+            {hasSession ? (
+              <SendTransaction onSessionReset={() => setHasSession(false)} />
+            ) : (
+              <CreateSession onSessionCreated={() => setHasSession(true)} />
+            )}
           </div>
         </div>
       </div>
