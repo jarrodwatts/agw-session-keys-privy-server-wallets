@@ -7,25 +7,29 @@ The Privy Server Wallet acts as a the "backend" wallet that is used as the signe
 
 ## Local Development
 
-1. [Clone the repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository).
+1. Get a copy of the `server-wallets-session-keys` example directory:
+
+   ```bash
+   mkdir -p server-wallets-session-keys && curl -L https://codeload.github.com/Abstract-Foundation/examples/tar.gz/main | tar -xz --strip=2 -C server-wallets-session-keys examples-main/server-wallets-session-keys && cd server-wallets-session-keys
+   ```
 
 2. Install the dependencies:
 
-```bash
-pnpm install
-```
+   ```bash
+   pnpm install
+   ```
 
 3. Start the local development server:
 
-```bash
-pnpm run dev
-```
+   ```bash
+   pnpm run dev
+   ```
 
 4. Create the environment variables file:
 
-```bash
-cp .env.example .env.local
-```
+   ```bash
+   cp .env.example .env.local
+   ```
 
 5. Create a new Privy app from the [Privy dashboard](https://dashboard.privy.io/).
 
@@ -54,3 +58,7 @@ And add them as environment variables in the `.env.local` file:
 PRIVY_SERVER_WALLET_ID=
 PRIVY_SERVER_WALLET_ADDRESS=
 ```
+
+_Note_: This example shows how to create a single server wallet and use them for all session keys. Alternatively, you may opt to generate a new server wallet per user.
+
+7. Visit [http://localhost:3000/](http://localhost:3000/) to test the app!
