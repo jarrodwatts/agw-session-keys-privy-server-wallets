@@ -11,12 +11,15 @@ import { SessionConfig } from "@abstract-foundation/agw-client/sessions";
 // The key to store the session key objects in localStorage
 const SESSION_KEY = "agw-session-config";
 
+// Hack to serialize BigInt values
+const BIGINT_PREFIX = "__bigint__";
+
 // Serialize the session key with a hack to handle BigInt values
 export function serializeWithBigInt(obj: SessionConfig): string {
   return JSON.stringify(obj, (key, value) => {
     // Convert BigInt to string with a special prefix
     if (typeof value === "bigint") {
-      return `__bigint__${value.toString()}`;
+      return `${BIGINT_PREFIX}${value.toString()}`;
     }
     return value;
   });
@@ -26,9 +29,8 @@ export function serializeWithBigInt(obj: SessionConfig): string {
 export function deserializeWithBigInt(json: string) {
   return JSON.parse(json, (key, value) => {
     // Check if the value is a string and has our special BigInt prefix
-    if (typeof value === "string" && value.startsWith("__bigint__")) {
-      // Convert back to BigInt
-      return BigInt(value.substring(10)); // Remove the '__bigint__' prefix
+    if (typeof value === "string" && value.startsWith(BIGINT_PREFIX)) {
+      return BigInt(value.substring(BIGINT_PREFIX.length));
     }
     return value;
   });
