@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { ironOptions, SessionData } from "../nonce/route";
+import { SessionData } from "../nonce/route";
 import { chain } from "@/const/chain";
+import { ironOptions } from "@/types/ironOptions";
 
 export async function GET() {
   try {
@@ -49,6 +50,7 @@ export async function GET() {
     });
   } catch (error) {
     // Return failure response without exposing error details
+    console.error("Error getting user:", error);
     return NextResponse.json({ ok: false });
   }
 }

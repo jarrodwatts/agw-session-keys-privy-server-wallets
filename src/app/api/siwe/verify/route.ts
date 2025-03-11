@@ -3,16 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { SiweMessage } from "siwe";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
-import { ironOptions, SessionData } from "../nonce/route";
+import { SessionData } from "../nonce/route";
 import { createPublicClient, http } from "viem";
 import { chain } from "@/const/chain";
+import { ironOptions } from "@/types/ironOptions";
 
 export async function POST(request: NextRequest) {
   try {
     // Get request body
     const { message, signature } = await request.json();
 
-    // Get session
     const session = await getIronSession<SessionData>(
       await cookies(),
       ironOptions
@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     // Return failure response without exposing error details
+    console.error("Error verifying SIWE message:", error);
     return NextResponse.json({ ok: false });
   }
 }

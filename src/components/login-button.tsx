@@ -3,7 +3,7 @@
 import { useLoginWithAbstract } from "@abstract-foundation/agw-react";
 import { Button } from "@/components/ui/button";
 import { useAccount, useSignMessage } from "wagmi";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createSiweMessage } from "viem/siwe";
 import { chain } from "@/const/chain";
 import { toast } from "sonner";

@@ -7,9 +7,9 @@ import { chain } from "@/const/chain";
 import { createSessionClient } from "@abstract-foundation/agw-client/sessions";
 import { deserializeWithBigInt } from "@/lib/session-storage";
 import { SessionData } from "../../siwe/nonce/route";
-import { ironOptions } from "../../siwe/nonce/route";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
+import { ironOptions } from "@/types/ironOptions";
 
 type ServerWalletResponse = {
   hash?: string;

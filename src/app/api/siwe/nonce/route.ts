@@ -4,14 +4,7 @@ import { NextResponse } from "next/server";
 import { generateNonce } from "siwe";
 import { getIronSession } from "iron-session";
 import { SiweMessage } from "siwe";
-
-export const ironOptions = {
-  cookieName: "siwe",
-  password: process.env.IRON_SESSION_PASSWORD as string,
-  cookieOptions: {
-    secure: process.env.NODE_ENV === "production",
-  },
-};
+import { ironOptions } from "@/types/ironOptions";
 
 export interface SessionData {
   nonce?: string;
