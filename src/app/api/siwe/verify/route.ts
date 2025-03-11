@@ -48,9 +48,7 @@ export async function POST(request: NextRequest) {
         // Store the SIWE response in the session
         session.isAuthenticated = true;
         session.address = siweMessage.address as `0x${string}`;
-        session.chainId = siweMessage.chainId;
-
-        // Save the updated session
+        session.siweMessage = siweMessage;
         await session.save();
       }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 import { ironOptions, SessionData } from "../nonce/route";
+import { chain } from "@/const/chain";
 
 export async function GET() {
   try {
@@ -13,11 +14,27 @@ export async function GET() {
 
     console.log("session", session);
 
-    // Check if session contains SIWE data
-    if (!session.isAuthenticated) {
+    if (!session.isAuthenticated || !session.siweMessage) {
       return NextResponse.json(
         { ok: false, message: "No user session found." },
-        { status: 404 }
+        { status: 401 }
+      );
+    }
+
+    if (
+      session.siweMessage.expirationTime &&
+      parseInt(session.siweMessage.expirationTime) < Date.now()
+    ) {
+      return NextResponse.json(
+        { ok: false, message: "SIWE session expired." },
+        { status: 401 }
+      );
+    }
+
+    if (session.siweMessage.chainId !== chain.id) {
+      return NextResponse.json(
+        { ok: false, message: "Invalid chain." },
+        { status: 401 }
       );
     }
 
@@ -27,7 +44,7 @@ export async function GET() {
       user: {
         isAuthenticated: session.isAuthenticated,
         address: session.address,
-        chainId: session.chainId,
+        siweMessage: session.siweMessage,
       },
     });
   } catch (error) {

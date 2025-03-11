@@ -1,8 +1,9 @@
 // app/api/nonce/route.ts
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { generateNonce, SiweResponse } from "siwe";
+import { generateNonce } from "siwe";
 import { getIronSession } from "iron-session";
+import { SiweMessage } from "siwe";
 
 export const ironOptions = {
   cookieName: "siwe",
@@ -16,7 +17,7 @@ export interface SessionData {
   nonce?: string;
   isAuthenticated?: boolean;
   address?: `0x${string}`;
-  chainId?: number;
+  siweMessage?: SiweMessage;
 }
 
 export async function GET() {
