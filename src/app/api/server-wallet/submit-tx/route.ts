@@ -6,6 +6,10 @@ import { parseAbi, type Address } from "viem";
 import { chain } from "@/const/chain";
 import { createSessionClient } from "@abstract-foundation/agw-client/sessions";
 import { deserializeWithBigInt } from "@/lib/session-storage";
+import { SessionData } from "../../siwe/nonce/route";
+import { ironOptions } from "../../siwe/nonce/route";
+import { getIronSession } from "iron-session";
+import { cookies } from "next/headers";
 
 type ServerWalletResponse = {
   hash?: string;
@@ -23,9 +27,25 @@ export async function POST(
   try {
     checkRequiredEnvVars();
 
+    // Get Auth session (SIWE)
+    const session = await getIronSession<SessionData>(
+      await cookies(),
+      ironOptions
+    );
+
+    if (!session.isAuthenticated) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!session.address) {
+      return NextResponse.json({ error: "No address found" }, { status: 401 });
+    }
+
+    const agwAddress = session.address;
+
     // Get the AGW wallet address and session config from the request body
     const body = await request.json();
-    const { agwAddress, sessionConfig: rawSessionConfig } = body;
+    const { sessionConfig: rawSessionConfig } = body;
     const sessionConfig = deserializeWithBigInt(rawSessionConfig);
 
     // Initialize Privy client using environment variables

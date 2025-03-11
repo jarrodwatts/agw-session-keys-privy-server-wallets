@@ -8,6 +8,7 @@ import { hasValidSession } from "@/lib/session-storage";
 
 export default function Home() {
   const [hasSession, setHasSession] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Listen for changes in the session key value in localStorage
   useEffect(() => {
@@ -38,14 +39,18 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col items-center space-y-6">
-          <LoginButton />
+          <LoginButton
+            isAuthenticated={isAuthenticated}
+            setIsAuthenticated={setIsAuthenticated}
+          />
 
           <div className="w-full max-w-md">
-            {hasSession ? (
-              <SendTransaction onSessionReset={() => setHasSession(false)} />
-            ) : (
-              <CreateSession onSessionCreated={() => setHasSession(true)} />
-            )}
+            {isAuthenticated &&
+              (hasSession ? (
+                <SendTransaction onSessionReset={() => setHasSession(false)} />
+              ) : (
+                <CreateSession onSessionCreated={() => setHasSession(true)} />
+              ))}
           </div>
         </div>
       </div>

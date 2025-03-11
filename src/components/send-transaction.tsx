@@ -59,7 +59,6 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          agwAddress: address,
           sessionConfig: serializeWithBigInt(sessionConfig),
         }),
       });
@@ -100,7 +99,7 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
         <Button
           onClick={handleSendTransaction}
           disabled={isSubmitting}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white mb-0"
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white mb-0 cursor-pointer"
         >
           {isSubmitting ? "Sending..." : "Mint NFT using Session Key"}
         </Button>
@@ -123,7 +122,7 @@ export function SendTransaction({ onSessionReset }: SendTransactionProps) {
         <Button
           onClick={handleResetSession}
           variant="outline"
-          className="w-full"
+          className="w-full  cursor-pointer"
         >
           Reset Session
         </Button>
