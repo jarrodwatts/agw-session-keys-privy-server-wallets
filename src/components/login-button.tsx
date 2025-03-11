@@ -31,7 +31,6 @@ export function LoginButton({
     const checkAuthentication = async () => {
       const response = await fetch("/api/siwe/get-user");
       const data = await response.json();
-      console.log(data);
       if (data.ok && data.user && data.user.isAuthenticated) {
         setIsAuthenticated(true);
       }
@@ -90,10 +89,8 @@ export function LoginButton({
       });
 
       const verifyData = await verifyRes.json();
-      console.log(verifyData);
 
       if (verifyData.ok) {
-        console.log("Authenticated");
         setIsAuthenticated(true);
       }
     } catch (error) {

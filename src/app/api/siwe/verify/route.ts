@@ -18,15 +18,10 @@ export async function POST(request: NextRequest) {
       ironOptions
     );
 
-    console.log("session here 21", session);
-
     const publicClient = createPublicClient({
       chain,
       transport: http(),
     });
-
-    console.log("message", message);
-    console.log("signature", signature);
 
     try {
       // Create and verify the SIWE message
@@ -35,10 +30,6 @@ export async function POST(request: NextRequest) {
         signature,
         nonce: session.nonce,
       });
-
-      console.log("HELLO???????");
-
-      console.log("valid", valid);
 
       // If verification is successful, update the session
       if (valid) {
